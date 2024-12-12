@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trees with Crows</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      flex-direction: column;
+      height: auto;
+      background-color: #d1d1d1;
+      overflow-x: hidden; 
+    }
+    .background {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+    }
+    .banner {
+  position: relative;
+  top: 0%;
+  left: 50%;
+  width: 827px;
+  height: 1500px;
+  transform: translate(-50%, 100%);
+  background-color: #6c6c6c;
+  padding: 20px 40px;
+  border: 2px solid #6b6b6b;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.control-panel {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: #555;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+    .control-panel button {
+      background-color: #6c6c6c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .control-panel button:hover {
+      background-color: #333;
+    }
+    .banner-content {
+      display: flex;
+      width: 100%;
+      transition: transform 0.5s ease-in-out;
+    }
+    .content-slide {
+      min-width: 100%;
+      box-sizing: border-box;
+      padding: 20px;
+      text-align: center;
+    }
+   
+   
+
+    .hill {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+      height: 40%;
+      background: linear-gradient(to top, #808080, #a1a1a1);
+    }
+    .hill.left {
+      clip-path: polygon(0% 100%, 0% 50%, 40% 60%, 60% 80%, 100% 100%);
+      background: linear-gradient(to top, #6c6c6c, #8e8e8ea1);
+    }
+    .hill.right {
+      clip-path: polygon(0% 100%, 40% 80%, 60% 60%, 100% 50%, 100% 100%);
+      background: linear-gradient(to top, #808080, #a1a1a1);
+    }
+    .mountain {
+      position: absolute;
+      bottom: 10%;
+      width: 60%;
+      height: 30%;
+      background: linear-gradient(to bottom, rgba(214, 13, 13, 0), #6b6b6b);
+      opacity: 0.5;
+    }
+    .mountain.left {
+      left: -10%;
+      clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+    }
+    .mountain.right {
+      right: -10%;
+      clip-path: polygon(0% 100%, 50% 0%, 100% 100%);
+    }
+    .tree {
+      position: absolute;
+      bottom: -50%;
+      width: 5px;
+      height: 600px;
+      background-color: #555;
+      border-radius: 4px;
+    }
+    .tree.left {
+      left: 15%;
+    }
+    .tree.right {
+      right: 15%;
+    }
+    .tree::before, .tree::after {
+      content: "";
+      position: absolute;
+      width: 5px;
+      background-color: #555;
+      border-radius: 4px;
+    }
+    .tree::before {
+      height: 50px;
+      top: 150px;
+      transform: rotate(-45deg);
+      left: -20px;
+    }
+    .tree::after {
+      height: 50px;
+      top: 150px;
+      transform: rotate(45deg);
+      right: -20px;
+    }
+    .tree .branch-top {
+      position: absolute;
+      width: 3px;
+      height: 30px;
+      background-color: #555;
+      top: 60px;
+      left: 0;
+    }
+    .tree .branch-mid {
+      position: absolute;
+      width: 3px;
+      height: 40px;
+      background-color: #555;
+      bottom: 100px;
+      left: 0;
+    }
+    .tree .branch-mid::before, .tree .branch-mid::after {
+      content: "";
+      position: absolute;
+      width: 3px;
+      height: 40px;
+      background-color: #555;
+    }
+    .tree .branch-mid::before {
+      transform: rotate(45deg);
+      left: -15px;
+    }
+    .tree .branch-mid::after {
+      transform: rotate(-45deg);
+      right: -15px;
+    }
+    
+    .crow {
+  position: absolute;
+  top: 0px;
+  left: -20px;
+  width: 75px; /* Уменьшено вдвое */
+  height: 50px; /* Уменьшено вдвое */
+  opacity: 1;
+  transition: opacity 1s;
+}
+
+.body {
+  width: 50px; /* Уменьшено вдвое */
+  height: 35px; /* Уменьшено вдвое */
+  background: #333;
+  border-radius: 50%;
+  position: absolute;
+  top: 15px; /* Корректировка позиции */
+  left: 12.5px; /* Корректировка позиции */
+}
+
+.wing {
+  width: 40px; /* Уменьшено вдвое */
+  height: 30px; /* Уменьшено вдвое */
+  background: rgb(117, 117, 117);
+  border-radius: 50%;
+  position: absolute;
+  top: 20px; /* Корректировка позиции */
+  left: 17.5px; /* Корректировка позиции */
+  animation: wingFlap 0.5s infinite ease-in-out;
+}
+
+.wing::after {
+  content: '';
+  position: absolute;
+  width: 30px; /* Уменьшено вдвое */
+  height: 20px; /* Уменьшено вдвое */
+  background: #333;
+  border-radius: 50%;
+  top: 10px; /* Корректировка позиции */
+  left: 5px; /* Корректировка позиции */
+  transform: rotate(-30deg);
+}
+
+.head {
+  width: 25px; /* Уменьшено вдвое */
+  height: 25px; /* Уменьшено вдвое */
+  background:#333;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  left: 35px; /* Корректировка позиции */
+}
+
+.eye {
+  width: 5px; /* Уменьшено вдвое */
+  height: 5px; /* Уменьшено вдвое */
+  background: white;
+  border-radius: 50%;
+  position: absolute;
+  top: 7.5px; /* Корректировка позиции */
+  left: 10px; /* Корректировка позиции */
+}
+
+.beak {
+  width: 15px; /* Уменьшено вдвое */
+  height: 7.5px; /* Уменьшено вдвое */
+  background: rgb(117, 117, 117);
+  position: absolute;
+  top: 12.5px; /* Корректировка позиции */
+  left: 25px; /* Корректировка позиции */
+  clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+
+.tail {
+  width: 25px; /* Уменьшено вдвое */
+  height: 10px; /* Уменьшено вдвое */
+  background: #333;
+  position: absolute;
+  bottom: -2.5px; /* Корректировка позиции */
+  left: 2.5px; /* Корректировка позиции */
+  clip-path: polygon(0 0, 50% 100%, 100% 0);
+}
+
+.legs {
+  position: absolute;
+  bottom: 0;
+  left: 25px; /* Корректировка позиции */
+}
+
+.leg {
+  width: 2.5px; /* Уменьшено вдвое */
+  height: 20px; /* Уменьшено вдвое */
+  background: #333;
+  position: absolute;
+  bottom: -20px; /* Корректировка позиции */
+}
+
+.leg:nth-child(2) {
+  left: 10px; /* Уменьшено вдвое */
+}
+
+    @keyframes takeoff {
+      0% {
+        transform: translate(0, 0) scale(1);
+      }
+      20% {
+        transform: translate(0, 10px) scale(0.95);
+      }
+      30% {
+        transform: translate(0, -50px) scale(1);
+      }
+      50% {
+        transform: translate(100px, -150px);
+      }
+      70% {
+        transform: translate(200px, -200px);
+      }
+      100% {
+        transform: translate(400px, -300px) scale(0.7);
+        opacity: 0;
+      }
+    }
+    @keyframes wingFlap {
+      0%, 100% {
+        transform: rotate(0deg) translateX(0) translateY(0);
+      }
+      50% {
+        transform: rotate(-30deg) translateX(-10px) translateY(-10px);
+      }
+    }
+    .crow.right {
+      left: auto;
+      right: -20px;
+      transform: scaleX(-1);
+    }
+
+    .grey-area {
+      width: 100%;
+      height: 150vh;
+      background-color: #808080;
+    }
+    .crow.left {
+  left: -95px; /* Позиция новой вороны */
+  opacity: 0;
+  transition: opacity 1s;
+  animation: takeoff 3s ease-in-out forwards;
+  transform: scaleX(1); /* Без инверсии */
+}
+
+    .line {
+  width: 100%; /* Ширина линии */
+  height: 6px; /* Толщина линии */
+  background-color:#d1d1d1;/* Цвет линии */
+  margin-top: 10px; /* Отступ сверху */
+}
+.moon {
+  position: absolute;
+  top: 20%; /* Положение сверху */
+  right: 10%; /* Положение справа */
+  width: 100px; /* Диаметр луны */
+  height: 100px; /* Диаметр луны */
+  background: radial-gradient(circle,#ececec(96, 66, 151, 0.8) 60%, rgba(255, 255, 255, 0) 100%), 
+              linear-gradient(to bottom, #ffffff, #ffffff); /* Градиенты */
+  border-radius: 50%; /* Сделать круг */
+  box-shadow: 0 0 20px 10px rgba(255, 255, 255, 0.3); /* Свечение */
+  z-index: 0; /* Луна находится позади основных элементов */
+  
+  
+}
+
+ h1 {
+  
+  margin: 0 0 10px;
+  font-size: 54px;
+  color:  #d1d1d1;
+  text-align: left;
+}
+ h2 {
+  
+  margin: 0 0 10px;
+  font-size: 54px;
+  color:  #d1d1d1;
+  text-align: center;
+}
+ p {
+  margin: 0;
+  font-size: 16px;
+  color:  #d1d1d1;
+  text-align: left;
+}
+
+ img {
+ width: 250px; /* Максимальная ширина изображения */
+  margin: 10px auto; /* Центрирование */
+  float: right;
+  display: block; /* Блочный элемент для изображения */
+  border-radius: 8px; /* Скругленные углы */
+
+}
+ 
+.independent-images img {
+  width: 130px; /* Ширина картинки */
+  height: 130px; /* Высота картинки */
+  border-radius: 50%; /* Закругленные углы */
+
+  object-fit: cover; /* Заполнение блока картинкой */
+
+ 
+}
+.independent-images {
+  position: relative; /* Независимое позиционирование внутри баннера */
+  left: 50%; /* Центрировать по горизонтали */
+  transform: translateX(-50%);
+  display: flex; /* Размещаем картинки в линию */
+  gap: 17px; /* Расстояние между картинками */
+  z-index: 1; /* Чтобы картинки были над другими элементами */
+}
+.bottom-images {
+  display: flex; /* Расположить картинки в одну линию */
+  justify-content: space-around; /* Равномерно распределить пространство между картинками */
+  align-items: center; /* Центрировать по вертикали */
+  position: relative; /* Расположить внутри баннера */
+  bottom: 20px; /* Отступ от нижнего края баннера */
+  left: 50%; /* Центрировать по горизонтали */
+  transform: translateX(-50%);
+  width: 90%; /* Ширина контейнера */
+}
+
+/* Стили для картинок */
+.bottom-images img {
+  width: 120px; /* Ширина каждой картинки */
+  height: 280px; /* Высота каждой картинки */
+  border: 2px solid #ccc; /* Рамка вокруг картинок */
+  border-radius: 8px; /* Закругленные углы */
+  object-fit: cover; /* Заполнить блок, сохраняя пропорции */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Тень */
+}
+
+/* Базовые стили */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #d1d1d1;
+  color: #000000;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Темная тема */
+body.dark-mode {
+  background-color: #333;
+  color: #ffffff;
+}
+
+/* Слайдер */
+.slider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: inherit; /* Наследует цвет фона от body */
+}
+
+/* Ползунок для переключения темы */
+.theme-switch {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.theme-switch input[type="checkbox"] {
+  appearance: none;
+  width: 40px;
+  height: 20px;
+  background: #d1d1d1;
+  border-radius: 10px;
+  position: relative;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.theme-switch input[type="checkbox"]:checked {
+  background: #4caf50;
+}
+
+.theme-switch input[type="checkbox"]::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background:  #d1d1d1;
+  border-radius: 50%;
+  top: 2px;
+  left: 2px;
+  transition: 0.3s;
+}
+
+.theme-switch input[type="checkbox"]:checked::before {
+  transform: translateX(20px);
+}
+
+.stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none; /* Чтобы не мешать взаимодействию с другими элементами */
+}
+
+.star {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background-color: white;
+  border-radius: 50%;
+  animation: twinkle 2s infinite ease-in-out;
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+.text-size-settings {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+.snowflakes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Чтобы снежинки не мешали кликам */
+  z-index: 9999; /* Снежинки поверх всех элементов */
+  overflow: hidden;
+}
+
+.snowflake {
+  position: absolute;
+  top: -10px;
+  background-color: white;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-100px);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(100vh);
+    opacity: 1;
+  }
+}
+.comments-container {
+      margin-top: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+    .comments-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      background-color: #6c6c6c;
+      color: #fff;
+      cursor: pointer;
+    }
+    .comments-header h3 {
+      margin: 0;
+    }
+    .comments-section {
+      display: none;
+      padding: 10px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .comment {
+      display: flex;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 10px;
+    }
+    .comment img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    .comment-content {
+      flex: 1;
+    }
+    .comment-content h4 {
+      margin: 0;
+      font-size: 14px;
+      color: #333;
+    }
+    .comment-content p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #555;
+    }
+    .add-comment {
+      display: flex;
+      margin-top: 10px;
+    }
+    .add-comment input {
+      flex: 1;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+    .add-comment button {
+      padding: 10px 20px;
+      background-color: #6c6c6c;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .add-comment button:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <div class="banner">
+    <div class="control-panel">
+      <button data-index="0">1</button>
+      <button data-index="1">2</button>
+      <button data-index="2">3</button>
+    </div>
+    <div class="banner-content">
+      <div class="content-slide" id="slide-1">
+        <img src="https://cdn-icons-png.flaticon.com/512/1396/1396740.png" alt="Forest Image" class="banner-image">
+        <h1>NORSE</h1>
+        <p>Скандинавская мифология<br>
+          – один из важнейших пластов<br>
+           мировоззрения брутальных м<br>
+           ореплавателей. Выверенные до<br>
+            мелочей представления о м<br>
+            ире богов позволяли викингам<br>
+             быть стойкими, сильными и п<br>
+             ереносить все невзгоды. Гла<br>
+             вные источники знаний о ска<br>
+             ндинавской мифологии – это <br>
+             «Старшая Эдда» и «Младшая Э<br>
+         </p>
+         <div class="line"></div>
+         <div class="independent-images">
+          <img src="иконка1.png.png" alt="Image 1">
+          <img src="иконка2.png.png" alt="Image 2">
+          <img src="иконка3.png.png" alt="Image 3">
+          <img src="иконка2.png.png" alt="Image 4">
+        </div>
+        <div class="line"></div>
+  <h2>history</h2>
+ 
+  
+  <div class="bottom-images">
+    <a href="https://ru.wikipedia.org/wiki/%D0%A1%D0%BA%D0%B0%D0%BD%D0%B4%D0%B8%D0%BD%D0%B0%D0%B2%D1%81%D0%BA%D0%B0%D1%8F_%D0%BC%D0%B8%D1%84%D0%BE%D0%BB%D0%BE%D0%B3%D0%B8%D1%8F">
+      <img src="карта.jpg" alt="Image 1">
+    </a>
+    <a href="page2.html">
+      <img src="карта.jpg" alt="Image 2">
+    </a>
+    <a href="page3.html">
+      <img src="карта.jpg" alt="Image 3">
+    </a>
+    <a href="page4.html">
+      <img src="карта.jpg" alt="Image 4">
+    </a>
+  </div>
+ <div class="line"></div>
+ <p>
+    
+  Добро пожаловать на наш сайт, посвящённый захватывающему миру скандинавской мифологии!
+  
+  Погрузитесь в древние легенды и предания, которые сформировали мировоззрение и культуру викингов и продолжают вдохновлять миллионы людей по всему миру. Наш сайт — это ваш путеводитель по волшебному миру богов, героев, чудовищ и последних последствий стихий.
+ </p>
+
+ <div class="comments-container">
+  <div class="comments-header" onclick="toggleComments()">
+    <h3>Comments</h3>
+    <span id="toggle-icon">▼</span>
+  </div>
+  <div class="comments-section" id="comments-section">
+    <div class="comment">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaN7J-wOA3mJ74fbl112iowJPm_0SziCPCiA&s" alt="Profile">
+      <div class="comment-content">
+        <h4>zxcDemon</h4>
+        <p>сайт не очень, я могу сделать лучше.</p>
+      </div>
+    </div>
+    <div class="comment">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSQogmxgYcQeNvUPHyeoR2N7JHFELMBRUwfuA&s" alt="Profile">
+      <div class="comment-content">
+        <h4>Опер уполнамоченный2014 </h4>
+        <p>харош</p>
+      </div>
+    </div>
+    <div class="add-comment">
+      <input type="text" id="comment-input" placeholder="Add a comment...">
+      <button onclick="addComment()">Post</button>
+    </div>
+  </div>
+</div>
+      </div>
+      <div class="content-slide" id="slide-2">
+        <h1>history of creation</h1>
+        <p>According to Norse mythology, one day the supreme god Odin saw the Norns, the Scandinavian mistresses of fate, at the base of the world tree Yggdrasil. They used runic signs to write fate. Hungry for this knowledge, Odin decided to learn the secrets of the runes himself.
+         </p>
+        <div class="line"></div>
+
+        <div class="independent-images">
+          <img src="иконка1.png.png" alt="Image 1">
+          <img src="иконка2.png.png" alt="Image 2">
+          <img src="иконка3.png.png" alt="Image 3">
+          <img src="иконка2.png.png" alt="Image 4">
+        </div>
+        <div class="line"></div>
+        <h1>Why were they used?</h1>
+        <div class="line"></div>
+        <p>Runes were carved into stones, used to write texts in Old Norse languages, and were considered sacred signs that conveyed secret knowledge and predictions. Runes form an alphabet known as the Futhark. Depending on the period and culture, the Futhark includes 24 signs.
+         </p>
+         <img src="https://cdn-icons-png.flaticon.com/512/1396/1396740.png" alt="Forest Image" class="banner-image">
+         <p>The history of runes goes back thousands of years. These ancient signs first appeared in early Germanic society and were used as writing, symbols of magic, and a means of communication with deities. Runes were carved into stones, used to write texts in Old Norse languages, and were considered sacred signs that conveyed secret knowledge and predictions.
+
+          The runes form an alphabet known as the Futhark. Depending on the period and culture, the Futhark includes 24 signs. Each rune has its own unique name and sound value. The symbolism of the runes is based on natural elements, social values, and mythology.
+          
+          The ancient Germans believed that the runes had magical powers that could influence the world around them. Runes were used in various magical rituals to predict the future, protect against harm, and gain wisdom. Each rune was believed to be associated with a certain deity or natural phenomenon, which gave it special energy.
+          
+          Runes played an important role in Scandinavian mythology. One of the most famous myths associated with runes is the myth of Odin's acquisition of knowledge of runes. According to the myth, Odin pierced his body with a spear and hung on the branches of the world tree Yggdrasil for nine days and nights. At the end of this period, he gained knowledge of runes and magic.
+        </p>
+      </div>
+      <div class="content-slide" id="slide-3">
+       
+        
+        <div class="slider">
+          <div class="slide">
+            <h1>Основной контент</h1>
+
+            <div class="settings">
+              <label class="theme-switch">
+                <span>Тёмная тема</span>
+                <input type="checkbox" id="theme-toggle">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+         <div class="language-settings">
+          <label for="language-select">Language:</label>
+          <select id="language-select">
+            <option value="en">English</option>
+            <option value="ru">Русский</option>
+            <option value="es">Español</option>
+          </select>
+        </div>
+        <div class="text-size-settings">
+          <label for="text-size">Text Size:</label>
+          <input type="range" id="text-size" min="12" max="36" value="16">
+        </div>
+        <div class="sound-settings">
+          <label>
+            <input type="checkbox" id="toggle-sound">
+            Background Music
+          </label>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  <div class="background">
+    <div class="background">
+      <div class="moon"></div>
+      <div class="mountain left"></div>
+      <div class="mountain right"></div>
+      <div class="hill left"></div>
+      <div class="hill right"></div>
+      <!-- Остальные элементы -->
+      <div class="stars"></div>
+
+    </div>
+    <div class="snowflakes" aria-hidden="true"></div>
+
+    <div class="mountain left"></div>
+    <div class="mountain right"></div>
+    <div class="hill left"></div>
+    <div class="hill right"></div>
+    <div class="tree left">
+      <div class="tree" style="left: -150px; top: -100px;"></div> <!-- Новое дерево слева -->
+      <div class="branch-top">
+        <div class="crow">
+          <div class="body"></div>
+          <div class="wing"></div>
+          <div class="tail"></div>
+          <div class="head">
+            <div class="eye"></div>
+            <div class="beak"></div>
+          </div>
+          <div class="legs">
+            <div class="leg"></div>
+            <div class="leg"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="branch-mid"></div>
+    </div>
+    <div class="tree left">
+      <div class="tree" style="left: -150px; top: -100px;"></div> <!-- Новое дерево слева -->
+      <div class="branch-top">
+        <!-- Добавляем новую ворону слева -->
+        <div class="crow left">
+          <div class="body"></div>
+          <div class="wing"></div>
+          <div class="tail"></div>
+          <div class="head">
+            <div class="eye"></div>
+            <div class="beak"></div>
+          </div>
+          <div class="legs">
+            <div class="leg"></div>
+            <div class="leg"></div>
+          </div>
+        </div>
+        <div class="crow">
+          <div class="body"></div>
+          <div class="wing"></div>
+          <div class="tail"></div>
+          <div class="head">
+            <div class="eye"></div>
+            <div class="beak"></div>
+          </div>
+          <div class="legs">
+            <div class="leg"></div>
+            <div class="leg"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="branch-mid"></div>
+      
+    </div>
+    <div class="clouds">
+      <div class="cloud cloud1"></div>
+      <div class="cloud cloud2"></div>
+      <div class="cloud cloud3"></div>
+    </div>
+    
+    
+      
+    <div class="tree right">
+      <div class="tree" style="right: -150px; top: -100px;"></div> <!-- Новое дерево ближе к центру -->
+      <div class="branch-top">
+        <div class="crow right">
+          <div class="body"></div>
+          <div class="wing"></div>
+          <div class="tail"></div>
+          <div class="head">
+            <div class="eye"></div>
+            <div class="beak"></div>
+          </div>
+          <div class="legs">
+            <div class="leg"></div>
+            <div class="leg"></div>
+          </div>
+        </div>
+      </div>
+      <div class="branch-mid"></div>
+    </div>
+  </div>
+
+  <div class="grey-area"></div>
+
+  <script>
+    window.addEventListener('scroll', function() {
+      const crows = document.querySelectorAll('.crow');
+      crows.forEach(function(crow) {
+        const rect = crow.getBoundingClientRect();
+        if (rect.top >= 0 && rect.bottom <= window.innerHeight) {
+          crow.style.opacity = 1;
+          crow.style.animation = 'takeoff 3s ease-in-out forwards';
+        } else {
+          crow.style.opacity = 0;
+          crow.style.animation = 'none';
+        }
+      });
+    });
+   
+  // Получаем элементы
+  const controlButtons = document.querySelectorAll('.control-panel button');
+  const slides = document.querySelectorAll('.content-slide');
+  const bannerContent = document.querySelector('.banner-content');
+
+  let currentSlideIndex = 0; // Текущий индекс слайда
+
+  // Функция для переключения слайдов
+  document.addEventListener("DOMContentLoaded", () => {
+      const buttons = document.querySelectorAll(".control-panel button");
+      const bannerContent = document.querySelector(".banner-content");
+      const body = document.body;
+     
+
+    
+
+      buttons.forEach(button => {
+        button.addEventListener("click", () => {
+          const index = parseInt(button.getAttribute("data-index"));
+          const shift = -index * 100;
+
+          // Перемещаем слайды
+          bannerContent.style.transform = `translateX(${shift}%)`;
+
+          // Меняем цвет фона
+          body.style.backgroundColor = backgrounds[index];
+
+          // Управляем пирамидами
+          if (index === 1) {
+            pyramids.forEach(pyramid => pyramid.classList.add("visible"));
+          } else {
+            pyramids.forEach(pyramid => pyramid.classList.remove("visible"));
+          }
+        });
+      });
+    });
+
+const themeToggle = document.getElementById('theme-toggle');
+themeToggle.addEventListener('change', () => {
+  document.body.classList.toggle('dark-mode');
+  
+  // Показать или скрыть звёзды в зависимости от темы
+  const stars = document.querySelector('.stars');
+  if (document.body.classList.contains('dark-mode')) {
+    stars.style.display = 'block';
+  } else {
+    stars.style.display = 'none';
+  }
+});
+function generateStars() {
+  const starsContainer = document.querySelector('.stars');
+  const starCount = 100; // Количество звёзд
+
+  for (let i = 0; i < starCount; i++) {
+    const star = document.createElement('div');
+    star.classList.add('star');
+    star.style.top = `${Math.random() * 100}%`;
+    star.style.left = `${Math.random() * 100}%`;
+    star.style.animationDuration = `${Math.random() * 2 + 1}s`; // Разное время мерцания
+    star.style.animationDelay = `${Math.random()}s`;
+    starsContainer.appendChild(star);
+  }
+}
+
+generateStars();
+
+const languageSelect = document.getElementById("language-select");
+const labels = {
+  en: { theme: "Switch Theme", textSize: "Text Size", background: "Background Color" },
+  ru: { theme: "Переключить тему", textSize: "Размер текста", background: "Цвет фона" },
+  es: { theme: "Cambiar tema", textSize: "Tamaño de texto", background: "Color de fondo" },
+};
+
+languageSelect.addEventListener("change", (event) => {
+  const selectedLang = event.target.value;
+  document.querySelector(".theme-switch span").textContent = labels[selectedLang].theme;
+  document.querySelector("label[for='text-size']").textContent = labels[selectedLang].textSize;
+  document.querySelector("label[for='bg-color']").textContent = labels[selectedLang].background;
+});
+const textSizeSlider = document.getElementById("text-size");
+
+textSizeSlider.addEventListener("input", (event) => {
+  document.body.style.fontSize = `${event.target.value}px`;
+});
+const toggleSound = document.getElementById("toggle-sound");
+const audio = new Audio("background-music.mp3");
+
+toggleSound.addEventListener("change", () => {
+  if (toggleSound.checked) {
+    audio.loop = true;
+    audio.play();
+  } else {
+    audio.pause();
+  }
+});
+
+  function createSnowflake() {
+    const snowflake = document.createElement('div');
+    snowflake.classList.add('snowflake');
+
+    // Задаем случайные размеры снежинок
+    const size = Math.random() * 5 + 5; // Размер от 5 до 10 пикселей
+    snowflake.style.width = `${size}px`;
+    snowflake.style.height = `${size}px`;
+
+    // Случайная горизонтальная позиция
+    snowflake.style.left = `${Math.random() * 100}vw`;
+
+    // Случайная длительность анимации
+    const duration = Math.random() * 5 + 5; // От 5 до 10 секунд
+    snowflake.style.animationDuration = `${duration}s`;
+
+    // Добавляем снежинку в контейнер
+    document.querySelector('.snowflakes').appendChild(snowflake);
+
+    // Удаляем снежинку после завершения анимации
+    setTimeout(() => {
+      snowflake.remove();
+    }, duration * 1000);
+  }
+
+  // Создаем снежинки каждые 200 мс
+  setInterval(createSnowflake, 200);
+
+  function toggleComments() {
+      const commentsSection = document.getElementById('comments-section');
+      const toggleIcon = document.getElementById('toggle-icon');
+      if (commentsSection.style.display === 'none' || !commentsSection.style.display) {
+        commentsSection.style.display = 'block';
+        toggleIcon.textContent = '▲';
+      } else {
+        commentsSection.style.display = 'none';
+        toggleIcon.textContent = '▼';
+      }
+    }
+
+    function addComment() {
+      const input = document.getElementById('comment-input');
+      const commentsSection = document.getElementById('comments-section');
+
+      if (input.value.trim() !== '') {
+        const commentDiv = document.createElement('div');
+        commentDiv.className = 'comment';
+
+        const img = document.createElement('img');
+        img.src = 'https://via.placeholder.com/40';
+        img.alt = 'Profile';
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'comment-content';
+
+        const h4 = document.createElement('h4');
+        h4.textContent = 'New User';
+
+        const p = document.createElement('p');
+        p.textContent = input.value;
+
+        contentDiv.appendChild(h4);
+        contentDiv.appendChild(p);
+        commentDiv.appendChild(img);
+        commentDiv.appendChild(contentDiv);
+
+        commentsSection.insertBefore(commentDiv, commentsSection.lastElementChild);
+        input.value = '';
+      }
+    }
+  </script>
+</body>
+</html>
